@@ -22,6 +22,21 @@ except ImportError:
     HAS_CRYPTO = False
 
 
+old_str_encrypt = str_encrypt
+def str_encrypt(plaintext, key, iv=IV, algorithm=None, salt=None):
+    return old_str_encrypt('BCFG2' + plaintext, key, iv, algorithm, salt)
+Bcfg2.Server.Encryption.str_encrypt = str_encrypt
+
+old_str_decrypt = str_decrypt
+def str_decrypt(crypted, key, iv=IV, algorithm=None):
+    plaintext = old_str_decrypt(crypted, key, iv, algorithm)
+    if plaintext[:5] == 'BCFG2':
+        print(plaintext)
+        return plaintext[5:]
+    raise EVPError
+Bcfg2.Server.Encryption.str_decrypt = str_decrypt
+
+
 class TestEncryption(Bcfg2TestCase):
     plaintext = """foo bar
 baz
